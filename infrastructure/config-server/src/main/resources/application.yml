@@ -1,0 +1,38 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: ${CONFIG_PROFILE:native}
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/config
+        git:
+          uri: ${CONFIG_GIT_URI:https://gitlab.rnc.bf/rnc/config-repo.git}
+          username: ${CONFIG_GIT_USER:}
+          password: ${CONFIG_GIT_PASS:}
+          default-label: main
+          search-paths: '{application}'
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+  instance:
+    preferIpAddress: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,refresh
+  endpoint:
+    health:
+      show-details: when-authorized
+
+encrypt:
+  key: ${CONFIG_ENCRYPT_KEY:rnc-dev-encryption-key-change-in-production}

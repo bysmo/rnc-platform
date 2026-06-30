@@ -1,0 +1,65 @@
+# ============================================================
+# RNC — Kubernetes Deployment: Eureka Server
+# ============================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: eureka-server
+  namespace: rnc
+  labels:
+    app: eureka-server
+    component: infrastructure
+spec:
+  selector:
+    app: eureka-server
+  ports:
+    - port: 8761
+      targetPort: 8761
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eureka-server
+  namespace: rnc
+  labels:
+    app: eureka-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eureka-server
+  template:
+    metadata:
+      labels:
+        app: eureka-server
+    spec:
+      containers:
+        - name: eureka
+          image: ghcr.io/rnc-burkina-faso/rnc-platform/eureka-server:latest
+          ports:
+            - containerPort: 8761
+          env:
+            - name: EUREKA_REGISTER
+              value: "false"
+            - name: EUREKA_FETCH
+              value: "false"
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8761
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8761
+            initialDelaySeconds: 30
+            periodSeconds: 5

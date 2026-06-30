@@ -1,0 +1,38 @@
+@startuml C1-Context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title RNC — Diagramme C4 de Niveau 1 (Contexte Système)
+
+' Personas
+Person(citizen, "Citoyen burkinabè", "Cherche un crédit rapide pour école, santé, agriculture")
+Person(merchant, "Fournisseur agréé", "École, centre de santé, coopérative, commerçant")
+Person(agent, "Agent IMF/Banque", "Analyse risque, valide KYC, gère remboursement")
+Person(admin, "Administrateur RNC", "Gouvernance nationale, audits, partenariats")
+Person(auditor, "Auditeur BCEAO / État", "Contrôle réglementaire, conformité")
+
+' Système principal
+System(rnc, "Réseau National de Confiance (RNC)", "Infrastructure numérique de confiance pour nano-crédit au Burkina Faso")
+
+' Systèmes externes
+System_Ext(mo_mo, "Mobile Money", "Orange Money, Moov Money, Telecel Money")
+System_Ext(banks, "Banques & IMF", "CORA, ECOBANK, Coris, RCPB, BCEAO BCEAO...")
+System_Ext(insurance, "Assurances", "NSIA, SONAR...")
+System_Ext(telco, "Passerelle SMS", "Envoi OTP, rappels, notifications")
+System_Ext(kyc, "État civil BF", "Vérification CIN (futur)")
+
+' Relations
+Rel(citizen, rnc, "Demande crédit, scan QR, signe dette, consulte score")
+Rel(merchant, rnc, "Reçoit paiement affecté, génère QR")
+Rel(agent, rnc, "Valide KYC, analyse risque, suit crédit")
+Rel(admin, rnc, "Gouvernance, audits, partenariats")
+Rel(auditor, rnc, "Contrôle réglementaire, extraction rapports")
+
+Rel(rnc, mo_mo, "Prélèvement remboursements, décaissement")
+Rel(rnc, banks, "Partage Trust Score, cofinancement")
+Rel(rnc, insurance, "Micro-assurance couplée crédit")
+Rel(rnc, telco, "Envoi SMS OTP & notifications")
+Rel(rnc, kyc, "Vérification CIN (roadmap)")
+
+LAY_L
+
+@enduml

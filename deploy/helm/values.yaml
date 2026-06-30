@@ -1,0 +1,155 @@
+# ============================================================
+# RNC Helm Chart — Values par défaut
+# ============================================================
+
+global:
+  imageRegistry: ghcr.io/rnc-burkina-faso/rnc-platform
+  imagePullPolicy: IfNotPresent
+  imagePullSecrets: []
+  storageClass: standard
+  domain: rnc.bf
+
+# Configuration PostgreSQL
+postgresql:
+  enabled: true
+  auth:
+    username: rnc
+    password: "change-me"
+    database: rnc
+  primary:
+    persistence:
+      size: 50Gi
+    resources:
+      requests:
+        memory: 1Gi
+        cpu: 500m
+      limits:
+        memory: 4Gi
+        cpu: 2000m
+
+# Redis
+redis:
+  enabled: true
+  auth:
+    password: "change-me"
+  master:
+    persistence:
+      size: 5Gi
+
+# Kafka
+kafka:
+  enabled: true
+  replicaCount: 3
+  autoCreateTopicsEnable: true
+  defaultReplicationFactor: 3
+  persistence:
+    size: 30Gi
+
+# RabbitMQ
+rabbitmq:
+  enabled: true
+  replicaCount: 3
+  auth:
+    username: rnc
+    password: "change-me"
+
+# Keycloak
+keycloak:
+  enabled: true
+  auth:
+    adminUser: admin
+    adminPassword: "change-me"
+  postgresql:
+    enabled: true
+  ingress:
+    enabled: true
+    hostname: auth.rnc.bf
+  replicas: 2
+
+# Eureka
+eureka:
+  enabled: true
+  replicaCount: 1
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 250m
+    limits:
+      memory: 1Gi
+      cpu: 500m
+
+# Config Server
+configServer:
+  enabled: true
+  replicaCount: 1
+
+# API Gateway
+apiGateway:
+  enabled: true
+  replicaCount: 2
+  ingress:
+    enabled: true
+    hostname: api.rnc.bf
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    tls: true
+
+# Auth Service
+authService:
+  enabled: true
+  replicaCount: 2
+
+# Trust microservices — template par défaut surchargé par service
+trustServices:
+  enabled: true
+  defaultReplicaCount: 3
+  defaultResources:
+    requests:
+      memory: 512Mi
+      cpu: 500m
+    limits:
+      memory: 1Gi
+      cpu: 1000m
+  services:
+    - name: trust-id
+      port: 8081
+    - name: trust-score
+      port: 8082
+    - name: trust-qr
+      port: 8083
+    - name: trust-credit
+      port: 8084
+      replicaCount: 4  # service critique
+    - name: trust-escrow
+      port: 8085
+      replicaCount: 4  # service critique
+    - name: trust-school
+      port: 8086
+    - name: trust-health
+      port: 8087
+    - name: trust-farming
+      port: 8088
+    - name: trust-insurance
+      port: 8089
+    - name: trust-debt
+      port: 8090
+    - name: trust-collect
+      port: 8091
+    - name: trust-merchant
+      port: 8092
+
+# Observability
+observability:
+  prometheus:
+    enabled: true
+    retention: 30d
+    storageSize: 50Gi
+  grafana:
+    enabled: true
+    adminPassword: "change-me"
+  loki:
+    enabled: true
+    persistenceSize: 100Gi
+  tempo:
+    enabled: true

@@ -1,0 +1,93 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_URL:http://localhost:8090}/realms/rnc
+          jwk-set-uri: ${KEYCLOAK_URL:http://localhost:8090}/realms/rnc/protocol/openid-connect/certs
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+      default-filters:
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter.replenishRate: 100
+            redis-rate-limiter.burstCapacity: 200
+      routes:
+        - id: trust-id
+          uri: lb://trust-id
+          predicates:
+            - Path=/api/v1/identity/**
+        - id: trust-score
+          uri: lb://trust-score
+          predicates:
+            - Path=/api/v1/score/**
+        - id: trust-qr
+          uri: lb://trust-qr
+          predicates:
+            - Path=/api/v1/qr/**
+        - id: trust-credit
+          uri: lb://trust-credit
+          predicates:
+            - Path=/api/v1/credits/**
+        - id: trust-escrow
+          uri: lb://trust-escrow
+          predicates:
+            - Path=/api/v1/escrow/**
+        - id: trust-school
+          uri: lb://trust-school
+          predicates:
+            - Path=/api/v1/school/**
+        - id: trust-health
+          uri: lb://trust-health
+          predicates:
+            - Path=/api/v1/health-financing/**
+        - id: trust-farming
+          uri: lb://trust-farming
+          predicates:
+            - Path=/api/v1/farming/**
+        - id: trust-insurance
+          uri: lb://trust-insurance
+          predicates:
+            - Path=/api/v1/insurance/**
+        - id: trust-debt
+          uri: lb://trust-debt
+          predicates:
+            - Path=/api/v1/debts/**
+        - id: trust-collect
+          uri: lb://trust-collect
+          predicates:
+            - Path=/api/v1/collect/**
+        - id: trust-merchant
+          uri: lb://trust-merchant
+          predicates:
+            - Path=/api/v1/merchants/**
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+  instance:
+    preferIpAddress: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,gateway
+  endpoint:
+    health:
+      show-details: when-authorized
+
+rnc:
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:3000,http://localhost:8081}
+  rate-limit:
+    enabled: true

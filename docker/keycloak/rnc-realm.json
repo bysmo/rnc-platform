@@ -1,0 +1,156 @@
+{
+  "id": "rnc-realm",
+  "realm": "rnc",
+  "displayName": "Réseau National de Confiance",
+  "displayNameHtml": "<div><b>RNC</b> — Burkina Faso</div>",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": true,
+  "loginWithEmailAllowed": false,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "permanentLockout": false,
+  "maxFailureWaitSeconds": 900,
+  "minimumQuickLoginWaitSeconds": 60,
+  "waitIncrementSeconds": 60,
+  "quickLoginCheckMilliSeconds": 1000,
+  "maxDeltaTimeSeconds": 43200,
+  "failureFactor": 5,
+
+  "roles": {
+    "realm": [
+      { "name": "CITIZEN", "description": "Citoyen — accès crédit, QR, dette", "composite": false },
+      { "name": "MERCHANT", "description": "Fournisseur partenaire agréé", "composite": false },
+      { "name": "BANK_AGENT", "description": "Agent banque/microfinance", "composite": false },
+      { "name": "INSURANCE_AGENT", "description": "Agent assurance", "composite": false },
+      { "name": "SCHOOL_ADMIN", "description": "Administration scolaire", "composite": false },
+      { "name": "HEALTH_ADMIN", "description": "Administration centre de santé", "composite": false },
+      { "name": "FARMING_COOP", "description": "Coopérative agricole", "composite": false },
+      { "name": "COLLECTOR", "description": "Agent de recouvrement", "composite": false },
+      { "name": "AUDITOR", "description": "Auditeur — lecture seule", "composite": false },
+      { "name": "ADMIN", "description": "Administrateur national RNC", "composite": false },
+      { "name": "SYSTEM", "description": "Compte technique service-à-service", "composite": false }
+    ]
+  },
+
+  "groups": [
+    { "name": "citizens", "path": "/citizens" },
+    { "name": "merchants", "path": "/merchants" },
+    { "name": "agents", "path": "/agents" },
+    { "name": "admins", "path": "/admins" }
+  ],
+
+  "clients": [
+    {
+      "clientId": "rnc-mobile-app",
+      "name": "RNC Mobile App (Flutter)",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "protocol": "openid-connect",
+      "redirectUris": ["rnc://callback", "http://localhost:*"],
+      "webOrigins": ["+"],
+      "attributes": {
+        "post.logout.redirect.uris": "rnc://logout"
+      }
+    },
+    {
+      "clientId": "rnc-admin-portal",
+      "name": "Portail d'administration RNC",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "rnc-admin-secret-dev-only",
+      "standardFlowEnabled": true,
+      "protocol": "openid-connect",
+      "redirectUris": ["http://localhost:3000/*", "https://admin.rnc.bf/*"],
+      "webOrigins": ["+"]
+    },
+    {
+      "clientId": "rnc-api-gateway",
+      "name": "API Gateway (machine-to-machine)",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "rnc-gateway-secret-dev-only",
+      "serviceAccountsEnabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "protocol": "openid-connect"
+    }
+  ],
+
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "admin@rnc.bf",
+      "firstName": "Super",
+      "lastName": "Admin",
+      "credentials": [
+        { "type": "password", "value": "Admin@2025", "temporary": false }
+      ],
+      "realmRoles": ["ADMIN", "AUDITOR"]
+    },
+    {
+      "username": "auditor",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "audit@rnc.bf",
+      "firstName": "Auditeur",
+      "lastName": "RNC",
+      "credentials": [
+        { "type": "password", "value": "Audit@2025", "temporary": false }
+      ],
+      "realmRoles": ["AUDITOR"]
+    },
+    {
+      "username": "citizen-demo",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "citizen@demo.bf",
+      "firstName": "Citoyen",
+      "lastName": "Démo",
+      "credentials": [
+        { "type": "password", "value": "Citizen@2025", "temporary": false }
+      ],
+      "realmRoles": ["CITIZEN"]
+    },
+    {
+      "username": "merchant-demo",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "merchant@demo.bf",
+      "firstName": "Marchand",
+      "lastName": "Démo",
+      "credentials": [
+        { "type": "password", "value": "Merchant@2025", "temporary": false }
+      ],
+      "realmRoles": ["MERCHANT"]
+    }
+  ],
+
+  "requiredActions": [
+    { "alias": "verify-profile", "name": "Verify Profile", "providerId": "VERIFY_PROFILE", "enabled": true, "defaultAction": false },
+    { "alias": "update_password", "name": "Update Password", "providerId": "UPDATE_PASSWORD", "enabled": true, "defaultAction": false },
+    { "alias": "terms_and_conditions", "name": "Terms and Conditions", "providerId": "terms_and_conditions", "enabled": true, "defaultAction": true }
+  ],
+
+  "authenticationFlows": [
+    {
+      "alias": "MFA OTP SMS",
+      "description": "Authentification multi-facteurs via OTP SMS",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "auth-username-password-form",
+          "requirement": "REQUIRED",
+          "priority": 10
+        }
+      ]
+    }
+  ]
+}
