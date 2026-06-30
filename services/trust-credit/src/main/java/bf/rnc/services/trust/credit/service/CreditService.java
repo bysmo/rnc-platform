@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -26,6 +27,11 @@ import java.util.UUID;
 public class CreditService {
 
     private final CreditRepository creditRepository;
+
+    @Transactional(readOnly = true)
+    public Optional<Credit> findById(UUID id) {
+        return creditRepository.findById(id);
+    }
 
     @Auditable(action = "REQUEST_CREDIT", resourceType = "Credit", actorType = "CITIZEN")
     @Transactional

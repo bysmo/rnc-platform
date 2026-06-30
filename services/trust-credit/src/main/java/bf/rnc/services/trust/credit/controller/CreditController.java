@@ -58,6 +58,6 @@ public class CreditController {
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('CITIZEN', 'ADMIN', 'AUDITOR')")
     public ResponseEntity<Credit> get(@PathVariable UUID id) {
-        return ResponseEntity.of(creditService.creditRepository().findById(id));
+        return ResponseEntity.of(creditService.findById(id));
     }
 }
