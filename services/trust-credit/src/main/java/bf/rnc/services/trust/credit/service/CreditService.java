@@ -28,11 +28,6 @@ public class CreditService {
 
     private final CreditRepository creditRepository;
 
-    @Transactional(readOnly = true)
-    public Optional<Credit> findById(UUID id) {
-        return creditRepository.findById(id);
-    }
-
     @Auditable(action = "REQUEST_CREDIT", resourceType = "Credit", actorType = "CITIZEN")
     @Transactional
     public Credit requestCredit(String citizenId, Money amount, String purpose,
@@ -114,5 +109,10 @@ public class CreditService {
         credit.setRejectionReason(reason);
 
         return creditRepository.save(credit);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Credit> findById(UUID id) {
+        return creditRepository.findById(id);
     }
 }

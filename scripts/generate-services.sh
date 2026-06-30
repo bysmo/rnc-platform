@@ -126,6 +126,7 @@ package $pkg_name;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 /**
@@ -133,6 +134,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * $description
  */
 @SpringBootApplication(scanBasePackages = {"$pkg_name", "bf.rnc.common"})
+@EnableDiscoveryClient
 @EnableFeignClients
 public class ${className}Application {
     public static void main(String[] args) {
@@ -213,6 +215,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         jdbc.lob.non_contextual_creation: true
         format_sql: false
+        default_schema: ${name//-/_}
     open-in-view: false
   flyway:
     enabled: true

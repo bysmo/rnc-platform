@@ -23,6 +23,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         jdbc.lob.non_contextual_creation: true
         format_sql: false
+        default_schema: trust_id
     open-in-view: false
   flyway:
     enabled: true
@@ -100,7 +101,49 @@ springdoc:
     path: /swagger-ui.html
     enabled: true
 
+# ============================================================
+# Configuration RNC spécifique à Trust ID
+# ============================================================
 rnc:
   service:
     name: trust-id
-    description: "Identité financière numérique — KYC, gestion Citoyens, CIN Burkina Faso, validation biométrique"
+    description: "Identité financière numérique — KYC, gestion Citoyens"
+
+  # OTP SMS
+  otp:
+    ttl-minutes: 10
+    rate-limit-minutes: 1
+    rate-limit-max-per-hour: 5
+
+  # SMS Gateway
+  sms:
+    mock: true            # true = console log (dev), false = vraie passerelle
+    sender: "RNC"
+    provider: mock        # mock | orange | moov | telecel
+
+  # Keycloak
+  keycloak:
+    mock: true            # true = stub (dev), false = vraie intégration Keycloak
+
+  # Sécurité
+  security:
+    pepper: ${RNC_SECURITY_PEPPER:dev-pepper-change-in-production}
+    encryption:
+      key: ${RNC_ENCRYPTION_KEY:}
+      hsm:
+        enabled: false
+
+# Keycloak config (pour Admin Client)
+keycloak:
+  server-url: ${KEYCLOAK_URL:http://localhost:8090}
+  realm: rnc
+  admin-client-id: ${KEYCLOAK_ADMIN_CLIENT:admin-cli}
+  admin-client-secret: ${KEYCLOAK_ADMIN_SECRET:}
+
+logging:
+  level:
+    bf.rnc: INFO
+    bf.rnc.services.trust.id: DEBUG
+    org.springframework.security: INFO
+    org.hibernate.SQL: WARN
+    org.flywaydb: INFO

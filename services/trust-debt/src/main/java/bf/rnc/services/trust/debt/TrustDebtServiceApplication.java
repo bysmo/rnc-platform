@@ -2,6 +2,7 @@ package bf.rnc.services.trust.debt;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 /**
@@ -9,6 +10,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * Reconnaissance de dette entre particuliers — consentement, horodatage, rappels
  */
 @SpringBootApplication(scanBasePackages = {"bf.rnc.services.trust.debt", "bf.rnc.common"})
+@EnableDiscoveryClient
 @EnableFeignClients
 public class TrustDebtServiceApplication {
     public static void main(String[] args) {

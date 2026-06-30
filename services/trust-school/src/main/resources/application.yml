@@ -23,6 +23,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         jdbc.lob.non_contextual_creation: true
         format_sql: false
+        default_schema: trust_school
     open-in-view: false
   flyway:
     enabled: true
