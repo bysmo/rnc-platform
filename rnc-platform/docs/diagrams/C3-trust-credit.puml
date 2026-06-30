@@ -1,0 +1,47 @@
+@startuml C3-TrustCredit-Component
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title RNC — Diagramme C4 Niveau 3 : Composants de Trust Credit
+
+Container_Boundary(trust_credit, "Trust Credit Service") {
+
+    Component(controller, "CreditController", "Spring MVC", "REST API endpoints")
+    Component(service, "CreditService", "Spring Service", "Logique métier: demande, approbation, déblocage")
+    Component(risk_engine, "RiskEngine", "Spring Service", "Analyse risque basée sur Trust Score + historique")
+    Component(repayment, "RepaymentScheduler", "Spring Service", "Génération échéancier, calcul intérêts")
+    Component(repository, "CreditRepository", "Spring Data JPA", "Persistance credits, paiements, échéances")
+    Component(outbox, "OutboxPublisher", "Spring Scheduled", "Publication events Kafka via Outbox pattern")
+    Component(audit, "AuditAspect", "Spring AOP", "Audit automatique des opérations")
+    Component(security, "SecurityContextHelper", "Spring Security", "Récupère utilisateur JWT courant")
+    Component(encryption, "HsmEncryptionService", "BouncyCastle", "Chiffrement données sensibles")
+
+    ContainerDb(db_credit, "trust_credit DB", "PostgreSQL", "credits, repayment_schedule, payments, outbox_events")
+}
+
+' External services
+System_Ext(trust_score, "Trust Score Service")
+System_Ext(trust_escrow, "Trust Escrow Service")
+System_Ext(kafka, "Kafka")
+System_Ext(mo_mo, "Mobile Money APIs")
+
+Rel(controller, service, "Calls")
+Rel(service, risk_engine, "Evaluates risk")
+Rel(service, repayment, "Generates schedule")
+Rel(service, repository, "CRUD")
+Rel(service, outbox, "Enqueue events")
+Rel(repository, db_credit, "Read/write")
+
+Rel(risk_engine, trust_score, "Get current score (Feign)")
+Rel(service, trust_escrow, "Reserve funds (Feign)")
+
+Rel(outbox, kafka, "Publish: rnc.credit.requested, rnc.credit.approved, rnc.credit.disbursed, rnc.credit.repaid")
+
+Rel(service, mo_mo, "Disburse to citizen MM account, collect repayments")
+
+Rel(controller, audit, "AOP intercept")
+Rel(controller, security, "Get current user")
+Rel(repository, encryption, "Encrypt sensitive fields")
+
+LAY_UD
+
+@enduml

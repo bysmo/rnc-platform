@@ -1,0 +1,119 @@
+# ============================================================
+# RNC — Kubernetes Deployment: Trust Credit Service (template)
+# ============================================================
+# Template réutilisable pour tous les microservices Trust*
+# Remplacer __SVC__ par le nom du service, __PORT__ par le port, __IMG__ par l'image
+# ============================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trust-credit-config
+  namespace: rnc
+data:
+  application-k8s.yml: |
+    spring:
+      datasource:
+        url: jdbc:postgresql://postgres-rw:5432/trust_credit
+        username: rnc
+        hikari:
+          maximum-pool-size: 30
+    eureka:
+      client:
+        serviceUrl:
+          defaultZone: http://eureka-server:8761/eureka/
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: trust-credit-secrets
+  namespace: rnc
+type: Opaque
+stringData:
+  postgres-password: "__FROM_VAULT__"
+  keycloak-secret: "__FROM_VAULT__"
+  encryption-key: "__FROM_VAULT__"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trust-credit
+  namespace: rnc
+spec:
+  selector:
+    app: trust-credit
+  ports:
+    - port: 8084
+      targetPort: 8084
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trust-credit
+  namespace: rnc
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: trust-credit
+  template:
+    metadata:
+      labels:
+        app: trust-credit
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8084"
+        prometheus.io/path: "/actuator/prometheus"
+    spec:
+      containers:
+        - name: trust-credit
+          image: ghcr.io/rnc-burkina-faso/rnc-platform/trust-credit:latest
+          ports:
+            - containerPort: 8084
+          envFrom:
+            - configMapRef:
+                name: trust-credit-config
+            - secretRef:
+                name: trust-credit-secrets
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8084
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8084
+            initialDelaySeconds: 30
+            periodSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8084
+            failureThreshold: 30
+            periodSeconds: 10
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - trust-credit
+                topologyKey: kubernetes.io/hostname
