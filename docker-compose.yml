@@ -19,9 +19,9 @@ services:
       POSTGRES_USER: rnc
       POSTGRES_PASSWORD: rnc
       POSTGRES_MULTIPLE_DATABASES: >-
-        trust_id,trust_score,trust_qr,trust_credit,trust_escrow,trust_school,
-        trust_health,trust_farming,trust_insurance,trust_debt,trust_collect,
-        trust_merchant,auth_service
+        trust-id,trust-score,trust-qr,trust-credit,trust-escrow,trust-school,
+        trust-health,trust-farming,trust-insurance,trust-debt,trust-collect,
+        trust-merchant,auth-service,keycloak
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/postgres/init-multi-db.sh:/docker-entrypoint-initdb.d/init-multi-db.sh:ro
