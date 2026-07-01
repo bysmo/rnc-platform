@@ -67,7 +67,7 @@ public class CreditService {
                 List.of(CreditStatus.ACTIVE, CreditStatus.DISBURSED));
         if (outstanding + request.getAmountXof() > MAX_OUTSTANDING_XOF) {
             throw new BusinessException("MAX_OUTSTANDING_EXCEEDED",
-                "Plafond d'encours total dépassé (max " + MAX_OUTSTANDING_XOF + " XOF)");
+                "Plafond d'encours total dépassé (max 500 000 XOF)");
         }
 
         // Créer le crédit
