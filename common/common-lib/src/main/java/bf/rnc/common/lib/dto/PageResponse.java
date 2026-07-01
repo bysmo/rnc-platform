@@ -29,4 +29,16 @@ public class PageResponse<T> {
                 .last(page.isLast())
                 .build();
     }
+
+    public static <T> PageResponse<T> empty() {
+        return PageResponse.<T>builder()
+                .content(java.util.List.of())
+                .page(0)
+                .size(0)
+                .totalElements(0)
+                .totalPages(0)
+                .first(true)
+                .last(true)
+                .build();
+    }
 }

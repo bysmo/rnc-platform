@@ -7,7 +7,7 @@ spring:
   config:
     import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
   datasource:
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:trust-qr}
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:trust_qr}
     username: ${POSTGRES_USER:rnc}
     password: ${POSTGRES_PASSWORD:rnc}
     hikari:
@@ -22,8 +22,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         jdbc.lob.non_contextual_creation: true
-        format_sql: false
-        default_schema: trust_qr
     open-in-view: false
   flyway:
     enabled: true
@@ -40,8 +38,6 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      properties:
-        spring.json.add.type.headers: false
     consumer:
       group-id: trust-qr
       auto-offset-reset: earliest
@@ -74,9 +70,6 @@ management:
   endpoint:
     health:
       show-details: when-authorized
-  health:
-    circuitbreakers:
-      enabled: true
 
 resilience4j:
   circuitbreaker:
@@ -104,4 +97,21 @@ springdoc:
 rnc:
   service:
     name: trust-qr
-    description: "Paiement par QR Code Confiance — génération, scan, autorisation, plafonds"
+    description: "QR Code Confiance — génération, scan, autorisation"
+  qr:
+    signature-key: ${RNC_QR_SIGNATURE_KEY:dev-qr-signature-key-change-in-production}
+    encryption-key: ${RNC_QR_ENCRYPTION_KEY:dev-qr-encryption-key-change-in-production}
+    default-ttl-seconds: 300
+    default-static-max-amount: 200000
+
+keycloak:
+  server-url: ${KEYCLOAK_URL:http://localhost:8090}
+  realm: rnc
+
+logging:
+  level:
+    bf.rnc: INFO
+    bf.rnc.services.trust.qr: DEBUG
+    org.springframework.security: INFO
+    org.hibernate.SQL: WARN
+    org.flywaydb: INFO

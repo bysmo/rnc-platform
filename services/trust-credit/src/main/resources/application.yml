@@ -7,7 +7,7 @@ spring:
   config:
     import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
   datasource:
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:trust-credit}
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:trust_credit}
     username: ${POSTGRES_USER:rnc}
     password: ${POSTGRES_PASSWORD:rnc}
     hikari:
@@ -22,8 +22,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         jdbc.lob.non_contextual_creation: true
-        format_sql: false
-        default_schema: trust_credit
     open-in-view: false
   flyway:
     enabled: true
@@ -74,9 +72,6 @@ management:
   endpoint:
     health:
       show-details: when-authorized
-  health:
-    circuitbreakers:
-      enabled: true
 
 resilience4j:
   circuitbreaker:
@@ -105,3 +100,25 @@ rnc:
   service:
     name: trust-credit
     description: "Nano-crédit instantané — demande, analyse risque, déblocage, remboursement"
+  credit:
+    max-active-per-citizen: 3
+    max-outstanding-xof: 500000
+    min-amount-xof: 5000
+    max-amount-xof: 500000
+    min-duration-days: 7
+    max-duration-days: 365
+    installment-interval-days: 30
+    default-grace-period-days: 3
+    default-threshold-days: 30
+
+keycloak:
+  server-url: ${KEYCLOAK_URL:http://localhost:8090}
+  realm: rnc
+
+logging:
+  level:
+    bf.rnc: INFO
+    bf.rnc.services.trust.credit: DEBUG
+    org.springframework.security: INFO
+    org.hibernate.SQL: WARN
+    org.flywaydb: INFO
