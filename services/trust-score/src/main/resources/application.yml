@@ -7,7 +7,7 @@ spring:
   config:
     import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
   datasource:
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:trust-score}
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:trust_score}
     username: ${POSTGRES_USER:rnc}
     password: ${POSTGRES_PASSWORD:rnc}
     hikari:
@@ -23,7 +23,6 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         jdbc.lob.non_contextual_creation: true
         format_sql: false
-        default_schema: trust_score
     open-in-view: false
   flyway:
     enabled: true
@@ -101,7 +100,30 @@ springdoc:
     path: /swagger-ui.html
     enabled: true
 
+# ============================================================
+# Configuration RNC spécifique à Trust Score
+# ============================================================
 rnc:
   service:
     name: trust-score
-    description: "Réputation financière nationale — Trust Score dynamique, algorithme explicable, audit régulier"
+    description: "Réputation financière nationale — Trust Score dynamique"
+
+  # Paramètres de scoring
+  scoring:
+    initial-score: 500
+    min-score: 0
+    max-score: 1000
+    recalculation-window-days: 365  # fenêtre de calcul des facteurs
+
+# Keycloak config
+keycloak:
+  server-url: ${KEYCLOAK_URL:http://localhost:8090}
+  realm: rnc
+
+logging:
+  level:
+    bf.rnc: INFO
+    bf.rnc.services.trust.score: DEBUG
+    org.springframework.security: INFO
+    org.hibernate.SQL: WARN
+    org.flywaydb: INFO
